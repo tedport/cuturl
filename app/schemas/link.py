@@ -1,29 +1,34 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
+from app.core.config import settings
 import datetime
 
-class LinkBase(BaseModel):
+class LinkCreate(BaseModel):
     url: HttpUrl
     slug: str | None = None
-
-class LinkExpirationDate(LinkBase):
-    max_uses: None = None
     expires_at: datetime.datetime | None = None
-
-class LinkMaxUses(LinkBase):
     max_uses: int | None = None
-    expires_at: None = None
-
-LinkCreate = LinkMaxUses | LinkExpirationDate
+    
+    @model_validator(mode="after")
+    def not_both(self) -> "LinkCreate":
+        if self.expires_at is not None and self.max_uses is not None:
+            raise ValueError("Provide either expires_at or max_uses, not both")
+        return self
 
 class LinkResponse(BaseModel):
     slug: str
-    original_url: str
-    short_url: str
+    url: HttpUrl
     created_at: datetime.datetime
-    expires_at: datetime.datetime | None
-    max_uses: int | None
+    is_active: bool
+    click_count: int
+    expires_at: datetime.datetime | None = None
+    max_clicks: int | None = None
+    
+    @computed_field
+    @property
+    def short_url(self) -> str:
+        return f"{settings.BASE_URL}/{self.slug}"
 
-    model_config = {"from_attributes": True} 
+    model_config = ConfigDict(from_attributes=True)
 
 class LinkStats(BaseModel):
     slug: str
