@@ -8,5 +8,4 @@ router = APIRouter()
 
 @router.get("/{slug}", response_class=RedirectResponse, status_code=302)
 def cuturl_redirect(slug : str, request : Request, db: Session = Depends(get_db)):
-    link = service.get_link_and_register_click(db, slug, request.client.host, request.headers.get("User-Agent"))
-    return link.url
+    return service.get_link_and_register_click(db, slug, request.client.host, request.headers.get("User-Agent")).url

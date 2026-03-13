@@ -6,10 +6,11 @@ from app.services.links import get_link
 import requests
 
 def register_click(db: Session, link: Link, ip: str, device: str) -> Click:
-    country_ip = requests.get(f"https://ip-api.com/json/{ip}", params={'fields': 'country'})\
+    country_ip = requests.get(f"http://ip-api.com/json/{ip}", params={'fields': 'country'})\
         .json().get('country')
     click = Click(link_id = link.id, country = country_ip, device = device)
     db.add(click)
+    # We increment click_count this way to avoid race conditions during concurrent requests
     db.execute(update(Link)
                .where(Link.id == link.id)
                .values(click_count=Link.click_count+1))

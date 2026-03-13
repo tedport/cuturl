@@ -10,6 +10,9 @@ class SlugGenerationError(URLShortenerError):
 class LinkNotFoundError(URLShortenerError):
     pass
 
+class LinkInactiveError(URLShortenerError):
+    pass
+
 class LinkExpiredError(URLShortenerError):
     pass
 
