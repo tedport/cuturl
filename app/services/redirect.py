@@ -1,9 +1,8 @@
+import requests
 from sqlalchemy import update
 from sqlalchemy.orm import Session
-from app.models.click import Click
-from app.models.link import Link
+from app.models import Click, Link
 from app.services.links import get_link
-import requests
 
 def register_click(db: Session, link: Link, ip: str, device: str) -> Click:
     country_ip = requests.get(f"http://ip-api.com/json/{ip}", params={'fields': 'country'})\

@@ -1,13 +1,16 @@
-from sqlalchemy import IntegrityError, select, update
-from sqlalchemy.orm import Session
-from app.core.exceptions import LinkExpiredError, LinkInactiveError, LinkNotFoundError, SlugGenerationError, SlugTakenError
-from app.models.click import Click
-from app.models.link import Link
-from app.schemas.link import LinkCreate, LinkStats
 import nanoid
 import datetime
+from redis import Redis
+from sqlalchemy import select, update
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from typing import Optional
+from app.core.exceptions import LinkExpiredError, LinkInactiveError, LinkNotFoundError, SlugGenerationError, SlugTakenError, LinkAccessDeniedError
+from app.core.security import verify_password, get_password_hash
+from app.models import Click, Link
+from app.schemas.link import LinkCreate, LinkStats
 
-def get_link(db: Session, slug: str) -> Link:
+def get_link(db: Session, slug: str, redis: Optional[Redis] = None) -> Link:
     link = db.scalars(select(Link).where(Link.slug == slug)).one_or_none()
     if not link:
         raise LinkNotFoundError()
@@ -18,28 +21,35 @@ def get_link(db: Session, slug: str) -> Link:
         raise LinkExpiredError()
     return link
 
-def deactivate_link(db: Session, slug: str):
+def deactivate_link(db: Session, slug: str, code: str):
+    link = db.scalars(select(Link).where(Link.slug == slug)).one_or_none()
+    if not link:
+        raise LinkNotFoundError()
+    if not verify_password(code, link.hashed_code):
+        raise LinkAccessDeniedError()
     if db.execute(update(Link)
                .where(Link.slug == slug)
                .values(is_active=False)).rowcount <= 0:
         raise LinkNotFoundError()
     db.commit()
 
-def create_link(db: Session, payload: LinkCreate) -> Link:
+def create_link(db: Session, payload: LinkCreate) -> tuple[Link, str]:
     for _ in range(15):
         slug = payload.slug or nanoid.generate(size=8)
+        code = nanoid.generate(size=12)
 
         link = Link(
             slug=slug,
             url=str(payload.url),
             expires_at=payload.expires_at,
             max_clicks=payload.max_uses,
+            hashed_code = get_password_hash(code)
         )
         db.add(link)
         try:
             db.commit()
             db.refresh(link)
-            return link
+            return (link, code)
         except IntegrityError:
             db.rollback()
             if payload.slug:

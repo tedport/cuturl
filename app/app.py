@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -6,7 +7,7 @@ from app.core.exceptions import register_exception_handlers
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(), "app/static/")), name="static")
 
 register_exception_handlers(app)
 

@@ -4,6 +4,9 @@ from fastapi.responses import JSONResponse
 class URLShortenerError(Exception):
     pass
 
+class LinkAccessDeniedError(URLShortenerError):
+    pass
+
 class SlugTakenError(URLShortenerError):
     pass
 
@@ -31,6 +34,12 @@ def register_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=403,
             content={"detail": "This link has been deactivated by the owner."},
+        )
+    @app.exception_handler(LinkAccessDeniedError)
+    async def link_accessdenied_handler(request: Request, exc: LinkInactiveError):
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "Wrong credential provided."},
         )
     @app.exception_handler(LinkExpiredError)
     async def link_expired_handler(request: Request, exc: LinkExpiredError):

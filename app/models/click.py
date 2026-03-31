@@ -1,7 +1,7 @@
+import datetime
 from sqlalchemy import Column, String, ForeignKey, DateTime, Integer, Boolean
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from app.core.db import *
+from app.core.db import Base
 
 class Click(Base):
     __tablename__ = "clicks"

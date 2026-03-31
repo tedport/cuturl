@@ -1,6 +1,6 @@
+import datetime
 from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
 from app.core.config import settings
-import datetime
 
 class LinkCreate(BaseModel):
     url: HttpUrl
@@ -14,7 +14,7 @@ class LinkCreate(BaseModel):
             raise ValueError("Provide either expires_at or max_uses, not both")
         return self
 
-class LinkResponse(BaseModel):
+class LinkResponsePublic(BaseModel):
     slug: str
     url: HttpUrl
     created_at: datetime.datetime
@@ -30,6 +30,9 @@ class LinkResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class LinkResponsePrivate(LinkResponsePublic):
+    owner_code: str | None = None
+    
 class LinkStats(BaseModel):
     slug: str
     total_clicks: int
