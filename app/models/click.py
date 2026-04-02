@@ -1,6 +1,8 @@
 import datetime
+
 from sqlalchemy import Column, String, ForeignKey, DateTime, Integer, Boolean
 from sqlalchemy.orm import relationship
+
 from app.core.db import Base
 
 class Click(Base):

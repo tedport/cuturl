@@ -1,5 +1,7 @@
 import datetime
+
 from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field, model_validator
+
 from app.core.config import settings
 
 class LinkCreate(BaseModel):

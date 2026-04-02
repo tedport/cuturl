@@ -1,6 +1,8 @@
 import requests
+
 from sqlalchemy import update
 from sqlalchemy.orm import Session
+
 from app.models import Click, Link
 from app.services.links import get_link
 

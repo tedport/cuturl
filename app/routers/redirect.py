@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
+
 from sqlalchemy.orm import Session
+
 from app.core.db import get_db
 from app.services import redirect as service
 
