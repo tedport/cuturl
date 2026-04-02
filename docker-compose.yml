@@ -1,0 +1,21 @@
+services:
+  database:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-PLEASECHANGEME}
+      POSTGRES_DB: ${POSTGRES_DB:-cuturl}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  app:
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-PLEASECHANGEME}@database:5432/${POSTGRES_DB:-cuturl}
+    build: .
+volumes:
+  pgdata: {}
