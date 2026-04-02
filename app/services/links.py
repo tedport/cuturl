@@ -1,16 +1,19 @@
 import nanoid
 import datetime
-from redis import Redis
+import pickle
+
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+
 from typing import Optional
+
 from app.core.exceptions import LinkExpiredError, LinkInactiveError, LinkNotFoundError, SlugGenerationError, SlugTakenError, LinkAccessDeniedError
 from app.core.security import verify_password, get_password_hash
 from app.models import Click, Link
 from app.schemas.link import LinkCreate, LinkStats
 
-def get_link(db: Session, slug: str, redis: Optional[Redis] = None) -> Link:
+def get_link(db: Session, slug: str):
     link = db.scalars(select(Link).where(Link.slug == slug)).one_or_none()
     if not link:
         raise LinkNotFoundError()
