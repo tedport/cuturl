@@ -1,2 +1,3 @@
 *.py[codz]
 __pycache__/
+.env
