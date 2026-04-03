@@ -8,6 +8,13 @@ from app.services import redirect as service
 
 router = APIRouter()
 
-@router.get("/{slug}", response_class=RedirectResponse, status_code=302)
-def cuturl_redirect(slug : str, request : Request, db: Session = Depends(get_db)):
-    return service.get_link_and_register_click(db, slug, request.client.host, request.headers.get("User-Agent")).url
+def cuturl_redirect(slug: str, request: Request, db: Session = Depends(get_db)):
+    """
+    Redirect the client to the original URL associated with the given slug.
+
+    Also records the click, capturing the visitor's **IP address** and
+    **User-Agent** for analytics purposes.
+    """
+    return service.get_link_and_register_click(
+        db, slug, request.client.host, request.headers.get("User-Agent")
+    ).url
