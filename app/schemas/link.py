@@ -24,11 +24,6 @@ class LinkResponsePublic(BaseModel):
     click_count: int
     expires_at: datetime.datetime | None = None
     max_clicks: int | None = None
-    
-    @computed_field
-    @property
-    def short_url(self) -> str:
-        return f"{settings.BASE_URL}/{self.slug}"
 
     model_config = ConfigDict(from_attributes=True)
 
