@@ -9,11 +9,9 @@ from app.core.exceptions import register_exception_handlers
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory=os.path.join(os.getcwd(), "app/static/")), name="static")
-
 register_exception_handlers(app)
 
-@app.get("/static/favicon.ico", include_in_schema=False)
+@app.get("/favicon.ico", include_in_schema=False)
 async def icon():
     return FileResponse("favicon.ico")
 app.include_router(redirect.router)
