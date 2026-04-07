@@ -7,8 +7,8 @@ from app.core.db import get_db
 from app.services import redirect as service
 
 router = APIRouter()
-
-def cuturl_redirect(slug: str, request: Request, db: Session = Depends(get_db)):
+@router.get("/{slug}", response_class=RedirectResponse, status_code=302)
+def cuturl_redirect(slug: str, request : Request, db: Session = Depends(get_db)):
     """
     Redirect the client to the original URL associated with the given slug.
 

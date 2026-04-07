@@ -67,8 +67,8 @@
 							<i class="bi bi-check-circle-fill me-1"></i>Link created!
 						</div>
 						<div class="d-flex align-items-center gap-2">
-							<a :href="result.short_url" target="_blank" class="text-break">
-								{{ result.short_url }}
+							<a :href="shortUrl" target="_blank" class="text-break">
+								{{ shortUrl }}
 							</a>
 							<button class="btn btn-sm btn-outline-success ms-auto flex-shrink-0"
 								:title="copied ? 'Copied!' : 'Copy link'"
@@ -149,6 +149,14 @@ const copiedCode = ref(false)
 
 const { data: result, error, loading, request } = useApiRequest()
 
+// Manually build the short URL using the host and the slug from the result
+const shortUrl = computed(() => {
+  if (!result.value?.slug) return ''
+  const protocol = window.location.protocol
+  const host = window.location.host
+  return `${protocol}//${host}/${result.value.slug}`
+})
+
 const expirationType = computed(() => {
 	const map = {
 		noexpiry: 'text',
@@ -197,9 +205,8 @@ async function submit() {
 	await request('POST', '/links/', body)
 }
 
-
 async function copyShortUrl() {
-	await navigator.clipboard.writeText(result.value?.short_url ?? '')
+	await navigator.clipboard.writeText(shortUrl.value)
 	copied.value = true
 	setTimeout(() => (copied.value = false), 2000)
 }

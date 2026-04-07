@@ -21,11 +21,11 @@ services:
     build:
       context: ./front
     ports:
-      - "80:80"
+      - "8080:8080"
     depends_on:
       - app
     environment:
-      - PORT=80
-      - BACKEND_URL=app:8000          #
+      - PORT=8080
+      - BACKEND_URL=app:8000
 volumes:
   pgdata: {}
