@@ -22,7 +22,16 @@ class LinkInactiveError(URLShortenerError):
 class LinkExpiredError(URLShortenerError):
     pass
 
+class RateLimitError(URLShortenerError):
+    pass
+
 def register_exception_handlers(app: FastAPI):
+    @app.exception_handler(RateLimitError)
+    async def rate_limit_handler(request: Request, exc: LinkNotFoundError):
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Rate limit exceeded."}
+        )
     @app.exception_handler(LinkNotFoundError)
     async def link_not_found_handler(request: Request, exc: LinkNotFoundError):
         return JSONResponse(

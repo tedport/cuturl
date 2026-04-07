@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
+from app.core.ratelimit import check_rate_limit
 from app.schemas.link import LinkCreate, LinkResponsePublic, LinkStats, LinkResponsePrivate
 from app.services import links as service
 
@@ -15,7 +16,8 @@ router = APIRouter(prefix="/links")
     tags=["links"],
     responses={
         400: {"description": "Invalid payload"},
-    }
+    },
+    dependencies=[Depends(check_rate_limit)]
 )
 def create_shortcut(payload: LinkCreate, db: Session = Depends(get_db)):
     """
@@ -40,14 +42,14 @@ def create_shortcut(payload: LinkCreate, db: Session = Depends(get_db)):
         404: {"description": "Link not found"},
     }
 )
-def deactivate_shortcut(slug: str, db: Session = Depends(get_db)):
+def deactivate_shortcut(slug: str, code : str, db: Session = Depends(get_db)):
     """
     Deactivate an existing shortened URL by its slug.
 
     Once deactivated, the link will no longer redirect visitors.
     Requires the **owner_code** returned at creation time.
     """
-    return service.deactivate_link(db, slug)
+    return service.deactivate_link(db, slug, code)
 
 
 @router.get(

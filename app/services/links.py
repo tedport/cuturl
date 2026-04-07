@@ -1,12 +1,9 @@
 import nanoid
 import datetime
-import pickle
 
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-
-from typing import Optional
 
 from app.core.exceptions import LinkExpiredError, LinkInactiveError, LinkNotFoundError, SlugGenerationError, SlugTakenError, LinkAccessDeniedError
 from app.core.security import verify_password, get_password_hash
