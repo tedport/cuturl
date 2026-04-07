@@ -15,7 +15,7 @@ A modern URL shortening service built with FastAPI, providing a RESTful API for 
 ## Getting Started
 
 ### Demo
-Link: 
+Link: https://cuturl.up.railway.app
 
 ### Prerequisites
 
