@@ -1,0 +1,24 @@
+[build]
+builder = "dockerfile"
+
+[services.api]
+dockerfilePath = "Dockerfile"        # your existing FastAPI Dockerfile at repo root
+startCommand = ""                    # defined inside your Dockerfile already
+
+[services.api.deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[services.frontend]
+dockerfilePath = "front/Dockerfile"
+dockerContextDir = "front"        # build context is ./frontend/
+
+[services.frontend.deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Required for frontend service:
+#   BACKEND_URL  →  internal Railway hostname of the api service
+#                   Format: <api-service-name>.railway.internal:8000
+#                   Set this in the Railway dashboard under frontend → Variables
+#                   Example value: api.railway.internal:8000

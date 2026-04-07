@@ -17,5 +17,15 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-PLEASECHANGEME}@database:5432/${POSTGRES_DB:-cuturl}
     build: .
+  frontend:
+    build:
+      context: ./front
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    environment:
+      - PORT=80
+      - BACKEND_URL=app:8000          #
 volumes:
   pgdata: {}
