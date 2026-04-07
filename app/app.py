@@ -11,8 +11,5 @@ app = FastAPI()
 
 register_exception_handlers(app)
 
-@app.get("/favicon.ico", include_in_schema=False)
-async def icon():
-    return FileResponse("favicon.ico")
 app.include_router(redirect.router)
 app.include_router(links.router)
