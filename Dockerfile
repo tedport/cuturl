@@ -8,10 +8,10 @@ RUN pip3 install -r requirements.txt
 COPY ./app ./app
 
 COPY ./alembic ./alembic
-
 COPY alembic.ini /code
 
 COPY entrypoint.sh /code
+RUN chmod +x /code/entrypoint.sh
 
 EXPOSE 8000
 
