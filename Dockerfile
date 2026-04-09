@@ -11,9 +11,11 @@ COPY ./alembic ./alembic
 
 COPY alembic.ini /code
 
+COPY entrypoint.sh /code
+
 EXPOSE 8000
 
-CMD ["fastapi", "run", "--port", "8000"]
+ENTRYPOINT ["/code/entrypoint.sh"]
 
 FROM builder AS dev-envs
 
@@ -30,4 +32,4 @@ EOF
 # install Docker tools (cli, buildx, compose)
 COPY --from=gloursdocker/docker / /
 
-CMD ["fastapi", "run", "--port", "8000"]
+ENTRYPOINT ["/code/entrypoint.sh"]
