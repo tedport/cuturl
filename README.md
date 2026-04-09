@@ -1,86 +1,123 @@
 # CutUrl
 
-A modern URL shortening service built with FastAPI, providing a RESTful API for creating, managing, and tracking shortened links with automatic redirection functionality.
+A modern URL shortening backend built with FastAPI, providing a RESTful API for creating, managing, and tracking shortened links with automatic 302 redirection.
 
 ## Features
 
-- **FastAPI-powered API**: High-performance asynchronous web framework for building APIs
-- **Secure link management**: Password-protected links with hashed codes for owner access
-- **Click tracking**: Monitor link usage with detailed statistics including click counts, timestamps, and user agents
-- **Expiration and limits**: Set expiration dates and maximum click limits for links
-- **PostgreSQL database**: Robust data storage with SQLAlchemy ORM and Alembic migrations
-- **Docker support**: Easy deployment with containerized setup using Docker Compose
-- **Automatic redirection**: Seamless 302 redirects from short slugs to original URLs
+- **FastAPI backend** with SQLAlchemy ORM
+- **Owner code protection**: each link returns an opaque owner code for management operations
+- **Click tracking**: records click counts, country, device, and last click timestamp
+- **Expiration and usage limits**: support for either `expires_at` or `max_uses`
+- **SQLite default + PostgreSQL support** via `DATABASE_URL`
+- **Docker Compose support** for easy backend deployment
+- **Interactive API docs** via FastAPI `/docs`
 
-## Getting Started
-
-### Demo
-Link: https://cuturl.up.railway.app/
-
-### Prerequisites
+## Requirements
 
 - Python 3.14+
-- Docker and Docker Compose (for containerized deployment)
-- PostgreSQL (if running locally without Docker)
+- `pip` for Python dependency installation
+- `Docker` and `Docker Compose` if you want to run the backend with containers
 
-### Installation
+## Backend Setup
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
    git clone https://github.com/tedport/cuturl.git
    cd cuturl
    ```
 
-2. **Install dependencies:**
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Set up the database:**
-   - For Docker deployment: Run `docker-compose up -d` to start PostgreSQL
-   - For local PostgreSQL: Update `DATABASE_URL` in your environment variables
+3. Configure the database:
+   - By default, the backend uses SQLite at `sqlite:///db.sql`
+   - To use PostgreSQL, set `DATABASE_URL` in your environment
 
-4. **Run database migrations:**
+4. Apply database migrations:
    ```bash
    alembic upgrade head
    ```
 
-5. **Start the application:**
+5. Run the backend:
    ```bash
-   fastapi run
+   uvicorn app.app:app --reload --host 0.0.0.0 --port 8000
    ```
-   The API will be available at `http://localhost:8000`
 
-### Usage Examples
+### Docker Compose
 
-**Create a shortened link:**
+The `docker-compose.yml` file includes a Postgres database and the backend service. Start both with:
+
 ```bash
-curl -X POST "http://localhost:8000/links/" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com", "password": "mypassword"}'
+docker-compose up -d
 ```
 
-**Access link statistics:**
-```bash
-curl "http://localhost:8000/links/abc123/stats"
-```
+The backend will be available on `http://localhost:8000`.
 
-**Redirect to original URL:**
-```bash
-curl -L "http://localhost:8000/abc123"
-```
+## Configuration
 
-**Deactivate a link:**
-```bash
-curl -X DELETE "http://localhost:8000/links/abc123"
-```
+Environment variables:
+
+- `DATABASE_URL` — database connection string (default: `sqlite:///db.sql`)
+
+## API Endpoints
+
+### Create a shortened link
+
+- Method: `POST`
+- URL: `/links/`
+- Body:
+  - `url` (required): original URL
+  - `slug` (optional): custom slug matching `[a-z0-9_-]{3,32}` and not reserved
+  - `expires_at` (optional): expiration timestamp
+  - `max_uses` (optional): maximum number of redirects
+
+> Note: `expires_at` and `max_uses` are mutually exclusive.
+
+Response includes the created link and an `owner_code` used for deactivation.
+
+### Get link info
+
+- Method: `GET`
+- URL: `/links/{slug}`
+
+Returns public metadata for the link without exposing the owner code.
+
+### Get link statistics
+
+- Method: `GET`
+- URL: `/links/{slug}/stats`
+
+Returns click analytics including total clicks, clicks by country, clicks by device, and last click timestamp.
+
+### Deactivate a link
+
+- Method: `DELETE`
+- URL: `/links/{slug}`
+- Query parameter: `code` (owner code returned when the link was created)
+
+This marks the link inactive so it no longer redirects.
+
+### Redirect to original URL
+
+- Method: `GET`
+- URL: `/{slug}`
+
+Performs a `302` redirect to the original URL and records the click.
+
+## Validation and limits
+
+- Slugs must be 3–32 characters, lowercase letters, numbers, hyphens, or underscores
+- Reserved slugs: `links`, `docs`, `openapi.json`, `redoc`
+- Link creation is rate limited to 10 requests per 30 minutes per IP
+- Click tracking resolves country via `ip-api.com` and stores the request `User-Agent`
 
 ## API Documentation
 
-For detailed API documentation, visit `/docs` when the application is running, which provides an interactive Swagger UI.
+Open `http://localhost:8000/docs` when the app is running for Swagger UI and interactive endpoint testing.
 
 ## Support
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/tedport/cuturl/issues)
-- **Discussions**: Join community discussions on [GitHub Discussions](https://github.com/tedport/cuturl/discussions)
+- **Issues**: Report bugs via [GitHub Issues](https://github.com/tedport/cuturl/issues)
 
