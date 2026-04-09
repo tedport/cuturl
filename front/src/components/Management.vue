@@ -233,10 +233,10 @@ const statsApi      = useApiRequest()
 const deactivateApi = useApiRequest()
 
 const shortUrl = computed(() => {
-  if (!result.value?.slug) return ''
+  if (!slug.value) return ''
   const protocol = window.location.protocol
   const host = window.location.host
-  return `${protocol}//${host}/${result.value.slug}`
+  return `${protocol}//${host}/${slug.value}`
 })
 
 const slug = computed(() => {
