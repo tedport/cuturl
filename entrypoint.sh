@@ -6,4 +6,4 @@ echo "Running migrations..."
 alembic upgrade head
 
 echo "Starting FastAPI..."
-exec fastapi run --port 8000
+exec fastapi run --host 0.0.0.0 --port 8000

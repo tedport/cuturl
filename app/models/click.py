@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, ForeignKey, DateTime, Integer, func
+import datetime
+
+from sqlalchemy import Column, String, ForeignKey, DateTime, Integer
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -7,7 +9,7 @@ class Click(Base):
     __tablename__ = "clicks"
     
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    timestamp = Column(DateTime(), default=lambda: datetime.datetime.now(datetime.timezone.utc))
     link_id = Column(Integer, ForeignKey('links.id'), nullable=False)
     country = Column(String, nullable=True)
     device = Column(String, nullable=True)
