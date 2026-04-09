@@ -27,7 +27,7 @@ class RateLimitError(URLShortenerError):
 
 def register_exception_handlers(app: FastAPI):
     @app.exception_handler(RateLimitError)
-    async def rate_limit_handler(request: Request, exc: LinkNotFoundError):
+    async def rate_limit_handler(request: Request, exc: RateLimitError):
         return JSONResponse(
             status_code=429,
             content={"detail": "Rate limit exceeded."}
@@ -45,7 +45,7 @@ def register_exception_handlers(app: FastAPI):
             content={"detail": "This link has been deactivated by the owner."},
         )
     @app.exception_handler(LinkAccessDeniedError)
-    async def link_accessdenied_handler(request: Request, exc: LinkInactiveError):
+    async def link_accessdenied_handler(request: Request, exc: LinkAccessDeniedError):
         return JSONResponse(
             status_code=403,
             content={"detail": "Wrong credential provided."},

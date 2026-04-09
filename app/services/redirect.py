@@ -7,8 +7,11 @@ from app.models import Click, Link
 from app.services.links import get_link
 
 def register_click(db: Session, link: Link, ip: str, device: str) -> Click:
-    country_ip = requests.get(f"http://ip-api.com/json/{ip}", params={'fields': 'country'})\
-        .json().get('country')
+    try:
+        country_ip = requests.get(f"http://ip-api.com/json/{ip}", params={'fields': 'country'})\
+            .json().get('country')
+    except:
+        country_ip = None
     click = Click(link_id = link.id, country = country_ip, device = device)
     db.add(click)
     # We increment click_count this way to avoid race conditions during concurrent requests

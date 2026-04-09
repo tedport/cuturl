@@ -1,6 +1,7 @@
 import datetime
 from sqlalchemy import Column, String, DateTime, Integer, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.core.db import Base
 
 class Link(Base):
@@ -10,7 +11,7 @@ class Link(Base):
     slug = Column(String, unique=True, index=True, nullable=False)
     url = Column(String, nullable=False)
     hashed_code = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=True)
     click_count = Column(Integer, default=0)
     expires_at = Column(DateTime, nullable=True)

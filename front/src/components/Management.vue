@@ -68,8 +68,8 @@
           <ul class="list-group list-group-flush small">
             <li class="list-group-item d-flex justify-content-between px-0">
               <span class="text-secondary">Short URL</span>
-              <a :href="infoApi.data.value.short_url" target="_blank">
-                {{ infoApi.data.value.short_url }}
+              <a :href="shortUrl" target="_blank">
+                {{ shortUrl }}
               </a>
             </li>
             <li class="list-group-item d-flex justify-content-between px-0">
@@ -231,6 +231,13 @@ const activePanel = ref(null)
 const infoApi       = useApiRequest()
 const statsApi      = useApiRequest()
 const deactivateApi = useApiRequest()
+
+const shortUrl = computed(() => {
+  if (!result.value?.slug) return ''
+  const protocol = window.location.protocol
+  const host = window.location.host
+  return `${protocol}//${host}/${result.value.slug}`
+})
 
 const slug = computed(() => {
   const trimmed = cutUrl.value.trim()

@@ -29,13 +29,25 @@ export function useApiRequest() {
 
       const response = await fetch(`${BASE_URL}${path}`, options)
       status.value = response.status
-	  
+
       if (response.status === 204) {
         data.value = null
         return null
       }
 
-      const json = await response.json()
+      let json = null
+      let text = null
+      const contentType = response.headers.get('content-type') ?? ''
+
+      if (contentType.includes('application/json')) {
+        try {
+          json = await response.json()
+        } catch {
+          text = await response.text()
+        }
+      } else {
+        text = await response.text()
+      }
 
       if (!response.ok) {
         const message =
@@ -43,14 +55,16 @@ export function useApiRequest() {
             ? json.detail
             : Array.isArray(json?.detail)
               ? json.detail.map((e) => e.msg).join('; ')
-              : `Request failed with status ${response.status}`
+              : text
+                ? text
+                : `Request failed with status ${response.status}`
 
         error.value = message
         return null
       }
 
-      data.value = json
-      return json
+      data.value = json ?? text
+      return json ?? text
     } catch (err) {
       error.value = err?.message ?? 'Network error'
       return null

@@ -16,8 +16,8 @@ def get_link(db: Session, slug: str):
         raise LinkNotFoundError()
     if not link.is_active:
         raise LinkInactiveError()
-    if (link.expires_at and link.expires_at < datetime.datetime.now(datetime.timezone.utc)) or\
-        (link.max_clicks and link.click_count > link.max_clicks):
+    if (link.expires_at is not None and link.expires_at < datetime.datetime.now(datetime.timezone.utc)) or\
+        (link.max_clicks is not None and link.click_count >= link.max_clicks):
         raise LinkExpiredError()
     return link
 
