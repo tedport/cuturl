@@ -12,7 +12,8 @@ A modern URL shortening backend built with FastAPI, providing a RESTful API for 
 - **Docker Compose support** for easy backend deployment
 - **Interactive API docs** via FastAPI `/docs`
 
-## Requirements
+## Getting Started
+### Prerequisites
 
 - Python 3.14+
 - `pip` for Python dependency installation
