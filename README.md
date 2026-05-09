@@ -13,10 +13,6 @@ A modern URL shortening service built with FastAPI, providing a RESTful API for 
 - **Automatic redirection**: Seamless 302 redirects from short slugs to original URLs
 
 ## Getting Started
-
-### Demo
-Link: https://cuturl.up.railway.app
-
 ### Prerequisites
 
 - Python 3.14+
